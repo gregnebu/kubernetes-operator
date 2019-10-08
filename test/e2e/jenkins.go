@@ -127,6 +127,14 @@ func createJenkinsCR(t *testing.T, name, namespace string, seedJob *[]v1alpha2.S
 					{Name: "github", Version: "1.29.4"},
 				},
 				NodeSelector: map[string]string{"kubernetes.io/hostname": "minikube"},
+				Tolerations: []corev1.Tolerations{
+					{
+						key: "jenkins",
+						operator: "Equal",
+						value: "true",
+						effect: "NoSchedule"
+					}
+				},
 			},
 			SeedJobs: seedJobs,
 		},

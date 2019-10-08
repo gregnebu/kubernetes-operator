@@ -550,6 +550,21 @@ func (r *ReconcileJenkinsBaseConfiguration) isRecreatePodNeeded(currentJenkinsMa
 		return true
 	}
 
+	//Remove default tolerations added to pods
+	var tolerations []corev1.Toleration
+	for i, t := range currentJenkinsMasterPod.Spec.Tolerations {
+		r.logger.Info(fmt.Sprintf("Investigating toleration '%+v'", t.Key))
+		if t.Key != "node.kubernetes.io/not-ready" && t.Key != "node.kubernetes.io/unreachable" {
+			tolerations = append(tolerations, currentJenkinsMasterPod.Spec.Tolerations[i])
+		}
+	}
+
+	if !reflect.DeepEqual(tolerations, r.jenkins.Spec.Master.Tolerations) {
+		r.logger.Info(fmt.Sprintf("Jenkins pod tolerations have changed, actual '%+v' required '%+v', recreating pod",
+			tolerations, r.jenkins.Spec.Master.Tolerations))
+		return true
+	}
+
 	if len(r.jenkins.Spec.Master.Annotations) > 0 &&
 		!reflect.DeepEqual(r.jenkins.Spec.Master.Annotations, currentJenkinsMasterPod.ObjectMeta.Annotations) {
 		r.logger.Info(fmt.Sprintf("Jenkins pod annotations have changed to '%+v', recreating pod", r.jenkins.Spec.Master.Annotations))

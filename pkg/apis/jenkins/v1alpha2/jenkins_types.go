@@ -218,6 +218,12 @@ type JenkinsMaster struct {
 	// +optional
 	NodeSelector map[string]string `json:"nodeSelector,omitempty"`
 
+	//Tolerations is a dictionary that should contain key, operator, value and effect keys.
+	// In that case, the operator defines a pod toleration according to the values of those keys.
+	// More info: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+	// +optional
+	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
+
 	// SecurityContext that applies to all the containers of the Jenkins
 	// Master. As per kubernetes specification, it can be overridden
 	// for each container individually.
